@@ -16,3 +16,5 @@ export type { TypographyVariant } from './typography';
 
 export { spacing, radius, shadows } from './spacing';
 export type { SpacingToken, RadiusToken, ShadowToken } from './spacing';
+
+export { ThemeProvider, useTheme } from './ThemeContext';
