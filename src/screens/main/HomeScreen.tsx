@@ -11,12 +11,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PromoBanner, QuickActions, RecentTransactions, WalletCard } from '@/components/home';
 import { Avatar, Text } from '@/components/ui';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useTheme } from '@/theme';
 import { spacing } from '@/theme/spacing';
 
 export function HomeScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
+  const displayName = user?.name ?? 'User';
 
   return (
     <View style={[styles.root, { backgroundColor: theme.bgApp }]}>
@@ -30,10 +33,10 @@ export function HomeScreen() {
             <Text variant="footnote" color="textSecondary">
               Selamat pagi 👋
             </Text>
-            <Text variant="title2">Rizki Adrian</Text>
+            <Text variant="title2">{displayName}</Text>
           </View>
           <Pressable hitSlop={8}>
-            <Avatar name="Rizki Adrian" size="md" />
+            <Avatar name={displayName} size="md" />
           </Pressable>
         </View>
 

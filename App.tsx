@@ -1,13 +1,17 @@
 /**
  * LingkarID App — Root component.
  *
- * Wraps the app with providers and shows either Login or Main Dashboard.
- * Dev toggle to switch between Login, Dashboard, and Design System.
+ * Auth-gated navigation:
+ * - Not hydrated → splash/loading
+ * - Not authenticated → LoginScreen
+ * - Authenticated → MainTabNavigator (Dashboard)
+ *
+ * Dev toggle retained for Design System access.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Pressable, StatusBar, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StatusBar, StyleSheet, View } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -16,69 +20,76 @@ import { Text } from '@/components/ui';
 import { MainTabNavigator } from '@/navigation';
 import { LoginScreen } from '@/screens/auth';
 import { DesignSystemScreen } from '@/screens/dev';
+import { useAuthStore } from '@/store/useAuthStore';
 import { ThemeProvider, useTheme } from '@/theme';
-
-type DevScreen = 'login' | 'dashboard' | 'design-system';
-
-const DEV_SCREENS: { key: DevScreen; label: string }[] = [
-  { key: 'login', label: 'Login' },
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'design-system', label: 'DS' },
-];
+import { colors } from '@/theme/colors';
 
 function AppContent() {
   const { isDark, theme } = useTheme();
-  const [currentScreen, setCurrentScreen] = useState<DevScreen>('dashboard');
+  const { isHydrated, isAuthenticated, hydrate } = useAuthStore();
+  const [showDesignSystem, setShowDesignSystem] = useState(false);
 
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case 'login':
-        return <LoginScreen />;
-      case 'design-system':
-        return <DesignSystemScreen />;
-      case 'dashboard':
-        return (
-          <NavigationContainer>
-            <MainTabNavigator />
-          </NavigationContainer>
-        );
-    }
-  };
+  // Hydrate auth state on mount
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
+  // Splash screen while hydrating
+  if (!isHydrated) {
+    return (
+      <View style={[styles.splash, { backgroundColor: theme.bgApp }]}>
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+        <View style={styles.splashLogo}>
+          <Text variant="title1" style={styles.splashLogoText}>
+            L
+          </Text>
+        </View>
+        <ActivityIndicator color={colors.primary[500]} style={styles.splashSpinner} />
+      </View>
+    );
+  }
+
+  // Design System override (dev only)
+  if (showDesignSystem) {
+    return (
+      <View style={styles.root}>
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+        <DesignSystemScreen />
+        <Pressable
+          onPress={() => setShowDesignSystem(false)}
+          style={[styles.devToggle, { backgroundColor: theme.buttonPrimary }]}
+        >
+          <Text variant="caption2" style={styles.devToggleText}>
+            ← Back
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.root}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
-      {renderScreen()}
 
-      {/* Dev toggle — remove in production */}
-      <View style={[styles.devBar, { backgroundColor: theme.bgElevated }]}>
-        {DEV_SCREENS.map((screen) => (
-          <Pressable
-            key={screen.key}
-            onPress={() => setCurrentScreen(screen.key)}
-            style={[
-              styles.devTab,
-              currentScreen === screen.key && {
-                backgroundColor: theme.buttonPrimary,
-              },
-            ]}
-          >
-            <Text
-              variant="caption2"
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                color:
-                  currentScreen === screen.key
-                    ? theme.textInverted
-                    : theme.textSecondary,
-                fontWeight: '600',
-              }}
-            >
-              {screen.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+      {isAuthenticated ? (
+        <NavigationContainer>
+          <MainTabNavigator />
+        </NavigationContainer>
+      ) : (
+        <LoginScreen />
+      )}
+
+      {/* Dev toggle for Design System — remove in production */}
+      {__DEV__ && (
+        <Pressable
+          onPress={() => setShowDesignSystem(true)}
+          style={[styles.devToggle, { backgroundColor: theme.bgElevated }]}
+        >
+          <Text variant="caption2" color="textSecondary" style={styles.devToggleText}>
+            DS
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -97,14 +108,34 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  devBar: {
+  splash: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashLogo: {
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    backgroundColor: colors.primary[500],
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashLogoText: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 32,
+  },
+  splashSpinner: {
+    marginTop: 24,
+  },
+  devToggle: {
     position: 'absolute',
     top: 60,
     right: 12,
-    flexDirection: 'row',
-    borderRadius: 16,
-    padding: 3,
-    gap: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 13,
     opacity: 0.85,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -112,10 +143,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  devTab: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 13,
+  devToggleText: {
+    fontWeight: '600',
   },
 });
 

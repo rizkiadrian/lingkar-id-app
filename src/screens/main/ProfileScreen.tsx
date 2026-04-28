@@ -22,6 +22,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Avatar, Badge, Button, Divider, Text } from '@/components/ui';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useTheme } from '@/theme';
 import { colors } from '@/theme/colors';
 import { radius, spacing } from '@/theme/spacing';
@@ -80,6 +81,10 @@ function MenuGroup({ items }: { items: MenuItem[] }) {
 export function ProfileScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const { user, logout, isLoading } = useAuthStore();
+
+  const displayName = user?.name ?? 'User';
+  const displayEmail = user?.email ?? '-';
 
   return (
     <View style={[styles.root, { backgroundColor: theme.bgApp }]}>
@@ -93,13 +98,13 @@ export function ProfileScreen() {
 
         {/* ─── Profile Card ────────────────────────────────────── */}
         <View style={[styles.profileCard, { backgroundColor: theme.bgCard }]}>
-          <Avatar name="Rizki Adrian" size="xl" />
+          <Avatar name={displayName} size="xl" />
           <View style={styles.profileInfo}>
-            <Text variant="title3">Rizki Adrian</Text>
+            <Text variant="title3">{displayName}</Text>
             <Text variant="subheadline" color="textSecondary">
-              rizki@email.com
+              {displayEmail}
             </Text>
-            <Badge variant="warning">Gold Member</Badge>
+            <Badge variant="warning">{user?.role_name ?? 'Client'}</Badge>
           </View>
         </View>
 
@@ -117,12 +122,7 @@ export function ProfileScreen() {
 
         {/* ─── Logout ──────────────────────────────────────────── */}
         <View style={styles.logoutSection}>
-          <Button
-            variant="destructive"
-            onPress={() => {
-              // Template — no auth logic
-            }}
-          >
+          <Button variant="destructive" loading={isLoading} disabled={isLoading} onPress={logout}>
             Keluar
           </Button>
           <Text variant="caption2" color="textTertiary" align="center" style={styles.version}>
