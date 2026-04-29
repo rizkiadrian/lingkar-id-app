@@ -18,7 +18,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui';
-import { ErrorBottomSheet } from '@/components/ui/ErrorBottomSheet';
+import { NotificationBottomSheet } from '@/components/ui/ErrorBottomSheet';
 import { AuthNavigator, MainTabNavigator } from '@/navigation';
 import { VerifyEmailScreen, VerifyOtpScreen } from '@/screens/auth';
 import { DesignSystemScreen } from '@/screens/dev';
@@ -116,7 +116,7 @@ function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AppContent />
-        <ErrorBottomSheet />
+        <NotificationBottomSheet />
       </ThemeProvider>
     </SafeAreaProvider>
   );

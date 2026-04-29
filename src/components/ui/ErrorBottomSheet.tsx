@@ -1,21 +1,25 @@
 /**
- * ErrorBottomSheet — global error display as iOS-style bottom sheet.
+ * NotificationBottomSheet — global notification display as iOS-style bottom sheet.
  *
+ * Supports both success (green) and error (red) types.
  * Renders at the root level (App.tsx). Automatically shown by the API
- * interceptor for non-form errors. Slides up from bottom with backdrop.
+ * interceptor for non-form errors. Can also be triggered manually for success.
  *
  * Usage:
  *   // In App.tsx root:
- *   <ErrorBottomSheet />
+ *   <NotificationBottomSheet />
+ *
+ *   // Show success from any screen:
+ *   useNotificationSheet.getState().show('success', 'OTP berhasil dikirim ulang');
  */
 
 import React, { useEffect, useRef } from 'react';
 
 import { Animated, Modal, Pressable, StyleSheet, View } from 'react-native';
 
-import { AlertCircle } from 'lucide-react-native';
+import { AlertCircle, CheckCircle } from 'lucide-react-native';
 
-import { useErrorStore } from '@/store/useErrorStore';
+import { useNotificationSheet } from '@/store/useErrorStore';
 import { useTheme } from '@/theme';
 import { colors } from '@/theme/colors';
 import { radius, shadows, spacing } from '@/theme/spacing';
@@ -24,9 +28,14 @@ import { fonts } from '@/theme/typography';
 import { Button } from './Button';
 import { Text } from './Text';
 
-export function ErrorBottomSheet() {
+const ICON_CONFIG = {
+  success: { Icon: CheckCircle, color: colors.success[500] },
+  error: { Icon: AlertCircle, color: colors.primary[500] },
+};
+
+export function NotificationBottomSheet() {
   const { theme } = useTheme();
-  const { visible, title, message, dismiss } = useErrorStore();
+  const { visible, type, title, message, dismiss } = useNotificationSheet();
 
   const slideAnim = useRef(new Animated.Value(300)).current;
   const backdropAnim = useRef(new Animated.Value(0)).current;
@@ -66,6 +75,8 @@ export function ErrorBottomSheet() {
     return null;
   }
 
+  const iconConfig = ICON_CONFIG[type];
+
   return (
     <Modal transparent visible={visible} animationType="none" onRequestClose={dismiss}>
       {/* Backdrop */}
@@ -89,11 +100,15 @@ export function ErrorBottomSheet() {
 
         {/* Icon */}
         <View style={styles.iconContainer}>
-          <AlertCircle size={40} color={colors.primary[500]} strokeWidth={1.8} />
+          <iconConfig.Icon size={40} color={iconConfig.color} strokeWidth={1.8} />
         </View>
 
         {/* Title */}
-        <Text variant="title3" align="center" style={[styles.title, { fontFamily: fonts.bold }]}>
+        <Text
+          variant="title3"
+          align="center"
+          style={[styles.title, { fontFamily: fonts.bold }]}
+        >
           {title}
         </Text>
 
@@ -103,13 +118,20 @@ export function ErrorBottomSheet() {
         </Text>
 
         {/* Dismiss button */}
-        <Button onPress={dismiss} style={styles.button}>
+        <Button
+          variant={type === 'success' ? 'primary' : 'primary'}
+          onPress={dismiss}
+          style={styles.button}
+        >
           Mengerti
         </Button>
       </Animated.View>
     </Modal>
   );
 }
+
+// Keep backward-compatible export name
+export { NotificationBottomSheet as ErrorBottomSheet };
 
 const styles = StyleSheet.create({
   backdrop: {

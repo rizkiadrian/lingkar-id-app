@@ -9,7 +9,14 @@ import { View, ScrollView, StyleSheet, Pressable } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PromoBanner, QuickActions, RecentTransactions, WalletCard } from '@/components/home';
+import {
+  MitraHighlight,
+  PromoBanner,
+  QuickActions,
+  RecentTransactions,
+  ServiceList,
+  WalletCard,
+} from '@/components/home';
 import { Avatar, Text } from '@/components/ui';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTheme } from '@/theme';
@@ -48,6 +55,16 @@ export function HomeScreen() {
         {/* ─── Quick Actions ───────────────────────────────────── */}
         <View style={styles.section}>
           <QuickActions />
+        </View>
+
+        {/* ─── Cari Mitra + Jasa Populer ───────────────────────── */}
+        <View style={styles.section}>
+          <MitraHighlight />
+        </View>
+
+        {/* ─── Jasa dari Mitra (full-bleed scroll) ─────────────── */}
+        <View style={styles.promoSection}>
+          <ServiceList />
         </View>
 
         {/* ─── Promo Banner (full-bleed scroll) ────────────────── */}

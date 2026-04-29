@@ -9,13 +9,14 @@
 
 import React, { useCallback, useState } from 'react';
 
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Text } from '@/components/ui';
 import { authService } from '@/services/auth';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useNotificationSheet } from '@/store/useErrorStore';
 import { colors, spacing, useTheme } from '@/theme';
 import { radius } from '@/theme/spacing';
 
@@ -30,7 +31,7 @@ export function VerifyEmailScreen() {
     setIsResending(true);
     try {
       await authService.resendVerificationEmail();
-      Alert.alert('Berhasil', 'Email verifikasi telah dikirim ulang.');
+      useNotificationSheet.getState().show('success', 'Email verifikasi telah dikirim ulang ke inbox Anda.');
     } catch {
       // Non-form error handled by global ErrorBottomSheet via interceptor
     } finally {

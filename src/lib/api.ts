@@ -15,7 +15,7 @@ import axios from 'axios';
 
 import { ENV } from '@/config/env';
 import { secureStorage } from '@/lib/secure-storage';
-import { useErrorStore } from '@/store/useErrorStore';
+import { useNotificationSheet } from '@/store/useErrorStore';
 
 import type {
   AxiosError,
@@ -177,7 +177,7 @@ apiClient.interceptors.response.use(
       Object.keys(customError.errors).length > 0;
 
     if (!isFormValidationError) {
-      useErrorStore.getState().showError(customError.message);
+      useNotificationSheet.getState().show('error', customError.message);
     }
 
     return Promise.reject(customError);

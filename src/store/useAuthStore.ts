@@ -2,7 +2,10 @@
  * Auth store — Zustand store for authentication state.
  *
  * Manages: login, logout, register, OTP verify, token hydration, user profile.
- * Pattern matches lingkar-crm/src/store/useUserProfile.ts
+ *
+ * Error handling: API errors are thrown by the Axios interceptor as CustomApiError.
+ * Non-form errors are auto-shown by the global ErrorBottomSheet via the interceptor.
+ * Screens only need to catch errors for field-level validation display.
  *
  * Usage:
  *   const { user, isAuthenticated, login, logout, register } = useAuthStore();
@@ -11,7 +14,6 @@
 import { create } from 'zustand';
 
 import { setForceLogoutHandler } from '@/lib/api';
-import type { CustomApiError } from '@/lib/api';
 import { secureStorage } from '@/lib/secure-storage';
 import { authService } from '@/services/auth';
 import type { ILoginPayload, IRegisterPayload, IUserAuth } from '@/services/auth';
@@ -82,18 +84,11 @@ export const useAuthStore = create<AuthState>((set, get) => {
     login: async (payload: ILoginPayload) => {
       set({ isLoading: true });
       try {
+        // On HTTP error, interceptor throws CustomApiError + shows ErrorBottomSheet
         const res = await authService.login(payload);
 
-        if (!res.success) {
-          throw { message: res.message, status: 400 } as CustomApiError;
-        }
-
-        // Store tokens securely
         await secureStorage.setTokens(res.data.access_token, res.data.refresh_token);
-
         set({ isAuthenticated: true });
-
-        // Fetch user profile
         await get().fetchProfile();
       } finally {
         set({ isLoading: false });
@@ -103,13 +98,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
     register: async (payload: IRegisterPayload) => {
       set({ isLoading: true });
       try {
+        // On HTTP error, interceptor throws CustomApiError + shows ErrorBottomSheet
         const res = await authService.register(payload);
 
-        if (!res.success) {
-          throw { message: res.message, status: 400 } as CustomApiError;
-        }
-
-        // Store tokens from credential
         await secureStorage.setTokens(
           res.data.credential.access_token,
           res.data.credential.refresh_token,
@@ -120,7 +111,6 @@ export const useAuthStore = create<AuthState>((set, get) => {
           pendingVerification: payload.verification_method || 'otp',
         });
 
-        // Fetch user profile
         await get().fetchProfile();
       } finally {
         set({ isLoading: false });
@@ -130,13 +120,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
     verifyOtp: async (otp: string) => {
       set({ isLoading: true });
       try {
-        const res = await authService.verifyOtp({ otp });
+        // On HTTP error, interceptor throws CustomApiError + shows ErrorBottomSheet
+        await authService.verifyOtp({ otp });
 
-        if (!res.success) {
-          throw { message: res.message, status: 400 } as CustomApiError;
-        }
-
-        // Refresh profile to get updated is_verified status
         await get().fetchProfile();
         set({ pendingVerification: null });
       } finally {
@@ -147,11 +133,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
     resendOtp: async () => {
       set({ isLoading: true });
       try {
-        const res = await authService.resendOtp();
-
-        if (!res.success) {
-          throw { message: res.message, status: 400 } as CustomApiError;
-        }
+        // On HTTP error, interceptor throws CustomApiError + shows ErrorBottomSheet
+        await authService.resendOtp();
       } finally {
         set({ isLoading: false });
       }
@@ -160,7 +143,6 @@ export const useAuthStore = create<AuthState>((set, get) => {
     logout: async () => {
       set({ isLoading: true });
       try {
-        // Best-effort backend logout (revoke tokens)
         await authService.logout().catch(() => {
           // Backend logout failed — still clear local state
         });

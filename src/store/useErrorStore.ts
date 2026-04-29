@@ -1,42 +1,63 @@
 /**
- * Global error store — manages error bottom sheet visibility.
+ * Global notification store — manages bottom sheet for success and error messages.
  *
- * Used by the API interceptor to automatically show non-form errors.
- * Screens no longer need Alert.alert() for API errors.
+ * Used by:
+ * - API interceptor: auto-show non-form errors
+ * - Screens: manually show success messages
  *
  * Usage:
- *   // Show error (called automatically by interceptor)
- *   useErrorStore.getState().showError('Kredensial salah');
- *
- *   // Dismiss (called by bottom sheet)
- *   useErrorStore.getState().dismiss();
+ *   useNotificationSheet.getState().show('success', 'Berhasil!');
+ *   useNotificationSheet.getState().show('error', 'Terjadi kesalahan');
  */
 
 import { create } from 'zustand';
 
-interface ErrorState {
-  /** Whether the error bottom sheet is visible */
+export type SheetType = 'success' | 'error';
+
+interface NotificationSheetState {
   visible: boolean;
-  /** Error title */
+  type: SheetType;
   title: string;
-  /** Error message body */
   message: string;
-  /** Show the error bottom sheet */
-  showError: (message: string, title?: string) => void;
-  /** Dismiss the error bottom sheet */
+  show: (type: SheetType, message: string, title?: string) => void;
   dismiss: () => void;
 }
 
-export const useErrorStore = create<ErrorState>((set) => ({
+const DEFAULT_TITLES: Record<SheetType, string> = {
+  success: 'Berhasil',
+  error: 'Terjadi Kesalahan',
+};
+
+export const useNotificationSheet = create<NotificationSheetState>((set) => ({
   visible: false,
+  type: 'error',
   title: '',
   message: '',
 
-  showError: (message: string, title = 'Terjadi Kesalahan') => {
-    set({ visible: true, title, message });
+  show: (type: SheetType, message: string, title?: string) => {
+    set({
+      visible: true,
+      type,
+      title: title ?? DEFAULT_TITLES[type],
+      message,
+    });
   },
 
   dismiss: () => {
     set({ visible: false });
   },
 }));
+
+/**
+ * @deprecated Use useNotificationSheet instead. Kept for backward compatibility.
+ */
+export const useErrorStore = {
+  getState: () => {
+    const state = useNotificationSheet.getState();
+    return {
+      ...state,
+      showError: (message: string, title?: string) =>
+        state.show('error', message, title),
+    };
+  },
+};

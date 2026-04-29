@@ -12,7 +12,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -31,6 +30,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui';
 import type { CustomApiError } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useNotificationSheet } from '@/store/useErrorStore';
 import { colors, spacing, useTheme } from '@/theme';
 import { radius } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
@@ -155,7 +155,7 @@ export function VerifyOtpScreen() {
     try {
       await resendOtp();
       setCountdown(RESEND_COOLDOWN);
-      Alert.alert('Berhasil', 'Kode OTP baru telah dikirim.');
+      useNotificationSheet.getState().show('success', 'Kode OTP baru telah dikirim ke email Anda.');
     } catch {
       // Non-form error handled by global ErrorBottomSheet via interceptor
     } finally {
