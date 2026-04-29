@@ -12,3 +12,4 @@ export { Card } from './Card';
 export { Badge } from './Badge';
 export { Divider } from './Divider';
 export { Avatar } from './Avatar';
+export { ErrorBottomSheet } from './ErrorBottomSheet';

@@ -3,8 +3,9 @@
  *
  * Auth-gated navigation:
  * - Not hydrated → splash/loading
- * - Not authenticated → LoginScreen
- * - Authenticated → MainTabNavigator (Dashboard)
+ * - Not authenticated → AuthNavigator (Login, Register, VerifyOtp, VerifyEmail)
+ * - Authenticated but not verified → VerifyOtp or VerifyEmail based on pendingVerification
+ * - Authenticated and verified → MainTabNavigator (Dashboard)
  *
  * Dev toggle retained for Design System access.
  */
@@ -17,8 +18,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui';
-import { MainTabNavigator } from '@/navigation';
-import { LoginScreen } from '@/screens/auth';
+import { ErrorBottomSheet } from '@/components/ui/ErrorBottomSheet';
+import { AuthNavigator, MainTabNavigator } from '@/navigation';
+import { VerifyEmailScreen, VerifyOtpScreen } from '@/screens/auth';
 import { DesignSystemScreen } from '@/screens/dev';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ThemeProvider, useTheme } from '@/theme';
@@ -26,7 +28,7 @@ import { colors } from '@/theme/colors';
 
 function AppContent() {
   const { isDark, theme } = useTheme();
-  const { isHydrated, isAuthenticated, hydrate } = useAuthStore();
+  const { isHydrated, isAuthenticated, user, pendingVerification, hydrate } = useAuthStore();
   const [showDesignSystem, setShowDesignSystem] = useState(false);
 
   // Hydrate auth state on mount
@@ -67,16 +69,31 @@ function AppContent() {
     );
   }
 
+  // Determine which screen tree to show
+  const isVerified = user?.is_verified !== false;
+  const needsVerification = isAuthenticated && !isVerified;
+
   return (
     <View style={styles.root}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
-      {isAuthenticated ? (
+      {isAuthenticated && isVerified ? (
+        // Authenticated + verified → Dashboard
         <NavigationContainer>
           <MainTabNavigator />
         </NavigationContainer>
+      ) : needsVerification ? (
+        // Authenticated but not verified → show verification screen
+        pendingVerification === 'email' ? (
+          <VerifyEmailScreen />
+        ) : (
+          <VerifyOtpScreen />
+        )
       ) : (
-        <LoginScreen />
+        // Not authenticated → Auth flow
+        <NavigationContainer>
+          <AuthNavigator />
+        </NavigationContainer>
       )}
 
       {/* Dev toggle for Design System — remove in production */}
@@ -99,6 +116,7 @@ function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AppContent />
+        <ErrorBottomSheet />
       </ThemeProvider>
     </SafeAreaProvider>
   );

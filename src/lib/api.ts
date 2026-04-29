@@ -15,6 +15,7 @@ import axios from 'axios';
 
 import { ENV } from '@/config/env';
 import { secureStorage } from '@/lib/secure-storage';
+import { useErrorStore } from '@/store/useErrorStore';
 
 import type {
   AxiosError,
@@ -166,6 +167,19 @@ apiClient.interceptors.response.use(
       status: error.response?.status,
       errors: error.response?.data?.errors,
     };
+
+    // Auto-show global error bottom sheet for non-form errors.
+    // Only 422 with field-level `errors` object is considered a form validation error
+    // (handled by screens). All other errors trigger the global bottom sheet.
+    const isFormValidationError =
+      customError.status === 422 &&
+      customError.errors &&
+      Object.keys(customError.errors).length > 0;
+
+    if (!isFormValidationError) {
+      useErrorStore.getState().showError(customError.message);
+    }
+
     return Promise.reject(customError);
   },
 );

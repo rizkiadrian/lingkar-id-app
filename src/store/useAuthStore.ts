@@ -1,11 +1,11 @@
 /**
  * Auth store — Zustand store for authentication state.
  *
- * Manages: login, logout, token hydration, user profile.
+ * Manages: login, logout, register, OTP verify, token hydration, user profile.
  * Pattern matches lingkar-crm/src/store/useUserProfile.ts
  *
  * Usage:
- *   const { user, isAuthenticated, login, logout } = useAuthStore();
+ *   const { user, isAuthenticated, login, logout, register } = useAuthStore();
  */
 
 import { create } from 'zustand';
@@ -14,7 +14,7 @@ import { setForceLogoutHandler } from '@/lib/api';
 import type { CustomApiError } from '@/lib/api';
 import { secureStorage } from '@/lib/secure-storage';
 import { authService } from '@/services/auth';
-import type { ILoginPayload, IUserAuth } from '@/services/auth';
+import type { ILoginPayload, IRegisterPayload, IUserAuth } from '@/services/auth';
 
 interface AuthState {
   /** Authenticated user profile */
@@ -25,11 +25,19 @@ interface AuthState {
   isHydrated: boolean;
   /** Whether an auth operation is in progress */
   isLoading: boolean;
+  /** Which verification method is pending after registration */
+  pendingVerification: 'otp' | 'email' | null;
 
   /** Hydrate auth state from secure storage on app start */
   hydrate: () => Promise<void>;
   /** Login with credentials, store tokens, fetch profile */
   login: (payload: ILoginPayload) => Promise<void>;
+  /** Register a new account, store tokens, fetch profile */
+  register: (payload: IRegisterPayload) => Promise<void>;
+  /** Verify OTP code, refresh profile on success */
+  verifyOtp: (otp: string) => Promise<void>;
+  /** Resend OTP code */
+  resendOtp: () => Promise<void>;
   /** Logout — revoke backend tokens, clear storage, reset state */
   logout: () => Promise<void>;
   /** Fetch user profile from /auth/me */
@@ -39,7 +47,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => {
   // Register force-logout handler so API interceptor can trigger logout
   setForceLogoutHandler(() => {
-    set({ user: null, isAuthenticated: false });
+    set({ user: null, isAuthenticated: false, pendingVerification: null });
   });
 
   return {
@@ -47,6 +55,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     isAuthenticated: false,
     isHydrated: false,
     isLoading: false,
+    pendingVerification: null,
 
     hydrate: async () => {
       try {
@@ -91,6 +100,63 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
     },
 
+    register: async (payload: IRegisterPayload) => {
+      set({ isLoading: true });
+      try {
+        const res = await authService.register(payload);
+
+        if (!res.success) {
+          throw { message: res.message, status: 400 } as CustomApiError;
+        }
+
+        // Store tokens from credential
+        await secureStorage.setTokens(
+          res.data.credential.access_token,
+          res.data.credential.refresh_token,
+        );
+
+        set({
+          isAuthenticated: true,
+          pendingVerification: payload.verification_method || 'otp',
+        });
+
+        // Fetch user profile
+        await get().fetchProfile();
+      } finally {
+        set({ isLoading: false });
+      }
+    },
+
+    verifyOtp: async (otp: string) => {
+      set({ isLoading: true });
+      try {
+        const res = await authService.verifyOtp({ otp });
+
+        if (!res.success) {
+          throw { message: res.message, status: 400 } as CustomApiError;
+        }
+
+        // Refresh profile to get updated is_verified status
+        await get().fetchProfile();
+        set({ pendingVerification: null });
+      } finally {
+        set({ isLoading: false });
+      }
+    },
+
+    resendOtp: async () => {
+      set({ isLoading: true });
+      try {
+        const res = await authService.resendOtp();
+
+        if (!res.success) {
+          throw { message: res.message, status: 400 } as CustomApiError;
+        }
+      } finally {
+        set({ isLoading: false });
+      }
+    },
+
     logout: async () => {
       set({ isLoading: true });
       try {
@@ -104,6 +170,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
           user: null,
           isAuthenticated: false,
           isLoading: false,
+          pendingVerification: null,
         });
       }
     },

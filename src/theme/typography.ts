@@ -1,7 +1,13 @@
 /**
- * Typography scale — iOS-modern inspired.
+ * Typography scale — iOS-modern inspired, using Inter font (same as CRM).
  *
- * Uses SF Pro (system font) on iOS and Roboto on Android.
+ * Font weights mapped to Inter font files:
+ * - 300: Inter-Light
+ * - 400: Inter-Regular
+ * - 500: Inter-Medium
+ * - 600: Inter-SemiBold
+ * - 700: Inter-Bold
+ *
  * Scale follows Apple HIG typography guidelines.
  *
  * Usage:
@@ -9,36 +15,32 @@
  *   style={typography.title1}
  */
 
-import { Platform } from 'react-native';
 import type { TextStyle } from 'react-native';
 
-const fontFamily = Platform.select({
-  ios: 'System',
-  android: 'Roboto',
-  default: 'System',
-});
-
-const fontFamilyMedium = Platform.select({
-  ios: 'System',
-  android: 'Roboto',
-  default: 'System',
-});
-
-const fontFamilyBold = Platform.select({
-  ios: 'System',
-  android: 'Roboto',
-  default: 'System',
-});
+/**
+ * Inter font family names — must match the file names linked via react-native-asset.
+ * On iOS, the font name is the PostScript name (same as filename without extension).
+ * On Android, the font name is the filename without extension.
+ */
+export const fonts = {
+  light: 'Inter-Light',
+  regular: 'Inter-Regular',
+  medium: 'Inter-Medium',
+  semiBold: 'Inter-SemiBold',
+  bold: 'Inter-Bold',
+  italic: 'Inter-Italic',
+  semiBoldItalic: 'Inter-SemiBoldItalic',
+} as const;
 
 /**
- * iOS HIG-inspired type scale.
+ * iOS HIG-inspired type scale using Inter font.
  * Each entry is a complete TextStyle ready to spread into a StyleSheet.
  */
 export const typography = {
   // ─── Display ─────────────────────────────────────────────────
   /** 34pt bold — Large Title (iOS navigation) */
   largeTitle: {
-    fontFamily: fontFamilyBold,
+    fontFamily: fonts.bold,
     fontSize: 34,
     lineHeight: 41,
     fontWeight: '700',
@@ -48,7 +50,7 @@ export const typography = {
   // ─── Headings ────────────────────────────────────────────────
   /** 28pt bold */
   title1: {
-    fontFamily: fontFamilyBold,
+    fontFamily: fonts.bold,
     fontSize: 28,
     lineHeight: 34,
     fontWeight: '700',
@@ -57,7 +59,7 @@ export const typography = {
 
   /** 22pt bold */
   title2: {
-    fontFamily: fontFamilyBold,
+    fontFamily: fonts.bold,
     fontSize: 22,
     lineHeight: 28,
     fontWeight: '700',
@@ -66,7 +68,7 @@ export const typography = {
 
   /** 20pt semibold */
   title3: {
-    fontFamily: fontFamilyMedium,
+    fontFamily: fonts.semiBold,
     fontSize: 20,
     lineHeight: 25,
     fontWeight: '600',
@@ -76,7 +78,7 @@ export const typography = {
   // ─── Body ────────────────────────────────────────────────────
   /** 17pt semibold — Headline */
   headline: {
-    fontFamily: fontFamilyMedium,
+    fontFamily: fonts.semiBold,
     fontSize: 17,
     lineHeight: 22,
     fontWeight: '600',
@@ -85,7 +87,7 @@ export const typography = {
 
   /** 17pt regular — Body */
   body: {
-    fontFamily,
+    fontFamily: fonts.regular,
     fontSize: 17,
     lineHeight: 22,
     fontWeight: '400',
@@ -94,7 +96,7 @@ export const typography = {
 
   /** 16pt regular — Callout */
   callout: {
-    fontFamily,
+    fontFamily: fonts.regular,
     fontSize: 16,
     lineHeight: 21,
     fontWeight: '400',
@@ -103,7 +105,7 @@ export const typography = {
 
   /** 15pt regular — Subheadline */
   subheadline: {
-    fontFamily,
+    fontFamily: fonts.regular,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '400',
@@ -113,7 +115,7 @@ export const typography = {
   // ─── Small ───────────────────────────────────────────────────
   /** 13pt regular — Footnote */
   footnote: {
-    fontFamily,
+    fontFamily: fonts.regular,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '400',
@@ -122,7 +124,7 @@ export const typography = {
 
   /** 12pt regular — Caption 1 */
   caption1: {
-    fontFamily,
+    fontFamily: fonts.regular,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '400',
@@ -131,7 +133,7 @@ export const typography = {
 
   /** 11pt regular — Caption 2 */
   caption2: {
-    fontFamily,
+    fontFamily: fonts.regular,
     fontSize: 11,
     lineHeight: 13,
     fontWeight: '400',
@@ -141,7 +143,7 @@ export const typography = {
   // ─── Utility ─────────────────────────────────────────────────
   /** 10pt medium — Overline / label */
   overline: {
-    fontFamily: fontFamilyMedium,
+    fontFamily: fonts.medium,
     fontSize: 10,
     lineHeight: 13,
     fontWeight: '500',

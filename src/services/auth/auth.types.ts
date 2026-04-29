@@ -41,3 +41,23 @@ export interface IUserAuth {
   sales_id: string | null;
   role_name: string;
 }
+
+/** Registration request payload */
+export interface IRegisterPayload {
+  email: string;
+  password: string;
+  password_confirmation: string;
+  full_name: string;
+  verification_method?: 'email' | 'otp';
+}
+
+/** Registration success response data */
+export interface IRegisterResponse {
+  user: IUserAuth;
+  credential: ILoginResponse;
+}
+
+/** OTP verification request payload */
+export interface IVerifyOtpPayload {
+  otp: string;
+}

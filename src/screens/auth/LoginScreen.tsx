@@ -10,7 +10,6 @@
 import React, { useCallback, useState } from 'react';
 
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -19,17 +18,22 @@ import {
   View,
 } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Text, TextInput } from '@/components/ui';
 import type { CustomApiError } from '@/lib/api';
+import type { AuthStackParamList } from '@/navigation/AuthNavigator';
 import { useAuthStore } from '@/store/useAuthStore';
 import { colors, spacing, useTheme } from '@/theme';
 import { radius } from '@/theme/spacing';
 
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 export function LoginScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const { login, isLoading } = useAuthStore();
 
   const [loginField, setLoginField] = useState('');
@@ -63,10 +67,8 @@ export function LoginScreen() {
           login: apiError.errors.login?.[0],
           password: apiError.errors.password?.[0],
         });
-      } else {
-        // General error
-        Alert.alert('Login Gagal', apiError.message || 'Terjadi kesalahan. Coba lagi.');
       }
+      // Non-form errors handled by global ErrorBottomSheet via interceptor
     }
   }, [loginField, password, login]);
 
@@ -172,7 +174,11 @@ export function LoginScreen() {
             <Text variant="subheadline" color="textSecondary">
               Belum punya akun?{' '}
             </Text>
-            <Pressable hitSlop={8} disabled={isLoading}>
+            <Pressable
+              hitSlop={8}
+              disabled={isLoading}
+              onPress={() => navigation.navigate('Register')}
+            >
               <Text variant="subheadline" color="textAccent" style={styles.registerLink}>
                 Daftar
               </Text>
