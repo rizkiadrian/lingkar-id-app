@@ -56,8 +56,7 @@ export const useErrorStore = {
     const state = useNotificationSheet.getState();
     return {
       ...state,
-      showError: (message: string, title?: string) =>
-        state.show('error', message, title),
+      showError: (message: string, title?: string) => state.show('error', message, title),
     };
   },
 };

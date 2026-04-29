@@ -98,7 +98,12 @@ function ServiceCard({ item }: { item: ServiceItem }) {
         {/* Rating + Location */}
         <View style={styles.metaRow}>
           <View style={styles.metaItem}>
-            <Star size={12} color={colors.warning[500]} strokeWidth={2.5} fill={colors.warning[500]} />
+            <Star
+              size={12}
+              color={colors.warning[500]}
+              strokeWidth={2.5}
+              fill={colors.warning[500]}
+            />
             <Text variant="caption2" color="textSecondary">
               {item.rating}
             </Text>

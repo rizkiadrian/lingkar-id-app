@@ -31,7 +31,9 @@ export function VerifyEmailScreen() {
     setIsResending(true);
     try {
       await authService.resendVerificationEmail();
-      useNotificationSheet.getState().show('success', 'Email verifikasi telah dikirim ulang ke inbox Anda.');
+      useNotificationSheet
+        .getState()
+        .show('success', 'Email verifikasi telah dikirim ulang ke inbox Anda.');
     } catch {
       // Non-form error handled by global ErrorBottomSheet via interceptor
     } finally {

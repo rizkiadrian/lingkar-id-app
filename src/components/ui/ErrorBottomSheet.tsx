@@ -104,11 +104,7 @@ export function NotificationBottomSheet() {
         </View>
 
         {/* Title */}
-        <Text
-          variant="title3"
-          align="center"
-          style={[styles.title, { fontFamily: fonts.bold }]}
-        >
+        <Text variant="title3" align="center" style={[styles.title, { fontFamily: fonts.bold }]}>
           {title}
         </Text>
 
