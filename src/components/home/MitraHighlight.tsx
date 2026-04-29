@@ -1,6 +1,5 @@
 /**
- * MitraHighlight — prominent CTA card to search for mitra partners.
- * Two-column layout: crimson card for "Cari Mitra" + tertiary card for "Jasa Populer".
+ * MitraHighlight — gradient CTA cards for Cari Mitra and Jasa Populer.
  */
 
 import React from 'react';
@@ -8,49 +7,64 @@ import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 
 import { Search, Star } from 'lucide-react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { Text } from '@/components/ui';
 import { colors } from '@/theme/colors';
-import { radius, shadows, spacing } from '@/theme/spacing';
+import { radius, spacing } from '@/theme/spacing';
 import { fonts } from '@/theme/typography';
 
 export function MitraHighlight() {
   return (
     <View style={styles.container}>
-      {/* Cari Mitra — primary CTA */}
-      <Pressable style={[styles.card, styles.mitraCard]}>
-        <View style={styles.iconBadge}>
-          <Search size={20} color={colors.white} strokeWidth={2.2} />
-        </View>
-        <Text variant="headline" style={[styles.cardTitle, { fontFamily: fonts.bold }]}>
-          Cari Mitra
-        </Text>
-        <Text variant="caption1" style={styles.cardDesc}>
-          Temukan mitra terpercaya di sekitar Anda
-        </Text>
-        <View style={styles.cardArrow}>
-          <Text variant="footnote" style={styles.arrowText}>
-            Jelajahi →
-          </Text>
-        </View>
+      {/* Cari Mitra — crimson gradient */}
+      <Pressable style={styles.cardWrapper}>
+        <LinearGradient
+          colors={[colors.primary[400], colors.primary[600], colors.primary[800]]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradient}
+        >
+          <View style={styles.inner}>
+            <View style={styles.iconBadge}>
+              <Search size={20} color={colors.white} strokeWidth={2.2} />
+            </View>
+            <Text variant="headline" style={[styles.cardTitle, { fontFamily: fonts.bold }]}>
+              Cari Mitra
+            </Text>
+            <Text variant="caption1" style={styles.cardDesc}>
+              Temukan mitra terpercaya di sekitar Anda
+            </Text>
+            <Text variant="footnote" style={styles.arrowText}>
+              Jelajahi →
+            </Text>
+          </View>
+        </LinearGradient>
       </Pressable>
 
-      {/* Jasa Populer — secondary CTA */}
-      <Pressable style={[styles.card, styles.jasaCard]}>
-        <View style={[styles.iconBadge, styles.jasaIconBadge]}>
-          <Star size={20} color={colors.white} strokeWidth={2.2} />
-        </View>
-        <Text variant="headline" style={[styles.jasaTitle, { fontFamily: fonts.bold }]}>
-          Jasa Populer
-        </Text>
-        <Text variant="caption1" style={styles.jasaDesc}>
-          Layanan paling diminati minggu ini
-        </Text>
-        <View style={styles.cardArrow}>
-          <Text variant="footnote" style={styles.jasaArrowText}>
-            Lihat →
-          </Text>
-        </View>
+      {/* Jasa Populer — ocean blue gradient */}
+      <Pressable style={styles.cardWrapper}>
+        <LinearGradient
+          colors={[colors.tertiary[500], colors.tertiary[700]]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradient}
+        >
+          <View style={styles.inner}>
+            <View style={styles.iconBadge}>
+              <Star size={20} color={colors.warning[300]} strokeWidth={2.2} />
+            </View>
+            <Text variant="headline" style={[styles.cardTitle, { fontFamily: fonts.bold }]}>
+              Jasa Populer
+            </Text>
+            <Text variant="caption1" style={styles.cardDesc}>
+              Layanan paling diminati minggu ini
+            </Text>
+            <Text variant="footnote" style={styles.arrowText}>
+              Lihat →
+            </Text>
+          </View>
+        </LinearGradient>
       </Pressable>
     </View>
   );
@@ -61,57 +75,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.md,
   },
-  card: {
+  cardWrapper: {
     flex: 1,
-    borderRadius: radius.xl,
+  },
+  gradient: {
+    borderRadius: radius.lg,
+  },
+  inner: {
     padding: spacing.lg,
-    minHeight: 150,
+    minHeight: 170,
     justifyContent: 'space-between',
-    ...shadows.md,
-  },
-  mitraCard: {
-    backgroundColor: colors.primary[500],
-    shadowColor: colors.primary[500],
-  },
-  jasaCard: {
-    backgroundColor: colors.secondary[800],
-    shadowColor: colors.secondary[800],
   },
   iconBadge: {
     width: 36,
     height: 36,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  jasaIconBadge: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    marginBottom: spacing.sm,
   },
   cardTitle: {
     color: colors.white,
     marginBottom: spacing['2xs'],
   },
   cardDesc: {
-    color: 'rgba(255,255,255,0.75)',
-  },
-  jasaTitle: {
-    color: colors.white,
-    marginBottom: spacing['2xs'],
-  },
-  jasaDesc: {
-    color: 'rgba(255,255,255,0.65)',
-  },
-  cardArrow: {
-    marginTop: spacing.sm,
+    color: 'rgba(255,255,255,0.7)',
   },
   arrowText: {
     color: 'rgba(255,255,255,0.9)',
     fontWeight: '600',
-  },
-  jasaArrowText: {
-    color: 'rgba(255,255,255,0.85)',
-    fontWeight: '600',
+    marginTop: spacing.sm,
   },
 });

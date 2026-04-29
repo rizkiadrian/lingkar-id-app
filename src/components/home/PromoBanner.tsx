@@ -1,14 +1,14 @@
 /**
- * PromoBanner — horizontal scrollable promo cards.
- * iOS modern style with rounded corners and auto-sizing.
+ * PromoBanner — horizontal scrollable promo cards with gradient backgrounds.
  */
 
 import React from 'react';
 
 import { View, ScrollView, StyleSheet, Pressable } from 'react-native';
 
+import LinearGradient from 'react-native-linear-gradient';
+
 import { Text } from '@/components/ui';
-import { useTheme } from '@/theme';
 import { colors } from '@/theme/colors';
 import { radius, shadows, spacing } from '@/theme/spacing';
 
@@ -17,8 +17,7 @@ interface PromoItem {
   title: string;
   subtitle: string;
   cta: string;
-  bgColor: string;
-  textColor: string;
+  gradient: string[];
 }
 
 const PROMOS: PromoItem[] = [
@@ -27,30 +26,25 @@ const PROMOS: PromoItem[] = [
     title: 'Cashback 20%',
     subtitle: 'Untuk deposit pertama kamu',
     cta: 'Klaim Sekarang',
-    bgColor: colors.primary[500],
-    textColor: colors.white,
+    gradient: [colors.primary[400], colors.primary[600], colors.primary[800]],
   },
   {
     id: '2',
     title: 'Gratis Transfer',
     subtitle: '10x transfer gratis bulan ini',
     cta: 'Lihat Detail',
-    bgColor: colors.tertiary[600],
-    textColor: colors.white,
+    gradient: [colors.tertiary[500], colors.tertiary[700]],
   },
   {
     id: '3',
     title: 'Referral Bonus',
     subtitle: 'Ajak teman, dapat Rp 50.000',
     cta: 'Bagikan Link',
-    bgColor: colors.secondary[800],
-    textColor: colors.white,
+    gradient: [colors.secondary[700], colors.secondary[950]],
   },
 ];
 
 export function PromoBanner() {
-  const { theme } = useTheme();
-
   return (
     <View>
       <View style={styles.header}>
@@ -71,30 +65,27 @@ export function PromoBanner() {
         snapToAlignment="start"
       >
         {PROMOS.map((promo) => (
-          <Pressable
-            key={promo.id}
-            style={[
-              styles.card,
-              {
-                backgroundColor: promo.bgColor,
-                borderColor: theme.borderSubtle,
-              },
-            ]}
-          >
-            <Text
-              variant="caption2"
-              style={[styles.promoSubtitle, { color: `${promo.textColor}99` }]}
+          <Pressable key={promo.id}>
+            <LinearGradient
+              colors={promo.gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.card, shadows.md]}
             >
-              {promo.subtitle}
-            </Text>
-            <Text variant="title3" style={[styles.promoTitle, { color: promo.textColor }]}>
-              {promo.title}
-            </Text>
-            <View style={styles.ctaContainer}>
-              <Text variant="footnote" style={[styles.ctaText, { color: promo.textColor }]}>
-                {promo.cta}
-              </Text>
-            </View>
+              <View style={styles.cardInner}>
+                <Text variant="caption2" style={styles.promoSubtitle}>
+                  {promo.subtitle}
+                </Text>
+                <Text variant="title3" style={styles.promoTitle}>
+                  {promo.title}
+                </Text>
+                <View style={styles.ctaContainer}>
+                  <Text variant="footnote" style={styles.ctaText}>
+                    {promo.cta}
+                  </Text>
+                </View>
+              </View>
+            </LinearGradient>
           </Pressable>
         ))}
       </ScrollView>
@@ -117,15 +108,19 @@ const styles = StyleSheet.create({
   card: {
     width: 280,
     borderRadius: radius.xl,
+    minHeight: 140,
+  },
+  cardInner: {
     padding: spacing.xl,
     justifyContent: 'space-between',
     minHeight: 140,
-    ...shadows.md,
   },
   promoSubtitle: {
+    color: 'rgba(255,255,255,0.7)',
     marginBottom: spacing.xs,
   },
   promoTitle: {
+    color: colors.white,
     fontWeight: '700',
     marginBottom: spacing.lg,
   },
@@ -137,6 +132,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   ctaText: {
+    color: colors.white,
     fontWeight: '600',
   },
 });

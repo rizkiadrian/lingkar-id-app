@@ -2,7 +2,7 @@
  * Design System Showcase — visual reference for all tokens and components.
  *
  * Similar to the CRM /design-system page.
- * Shows: Colors, Typography, Spacing, Buttons, Inputs, Cards, Badges, Avatars.
+ * Shows: Colors, Typography, Spacing, Buttons, Inputs, Cards, Badges, Avatars, Home Components.
  */
 
 import React from 'react';
@@ -11,6 +11,7 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { WalletCard, QuickActions, PromoBanner } from '@/components/home';
 import { Text, Button, TextInput, Card, Badge, Divider, Avatar } from '@/components/ui';
 import type { typography } from '@/theme';
 import { useTheme, colors, spacing, radius } from '@/theme';
@@ -239,6 +240,46 @@ export function DesignSystemScreen() {
           </View>
         </Section>
 
+        {/* ─── Home Components ──────────────────────────────── */}
+        <Section title="Home Components">
+          <Text variant="footnote" color="textTertiary" style={styles.componentNote}>
+            Composite components used on the Home screen.
+          </Text>
+
+          <Text variant="headline" style={styles.componentLabel}>
+            WalletCard
+          </Text>
+          <Text variant="caption1" color="textTertiary" style={styles.componentDesc}>
+            Gradient hero card. Pattern: LinearGradient (borderRadius only) → inner View (padding).
+            No overflow hidden.
+          </Text>
+          <View style={styles.componentPreview}>
+            <WalletCard />
+          </View>
+
+          <Text variant="headline" style={styles.componentLabel}>
+            QuickActions
+          </Text>
+          <Text variant="caption1" color="textTertiary" style={styles.componentDesc}>
+            Clean 4×2 grid. Flat tinted backgrounds (primary/50) with primary/600 icons. No
+            gradients, no shadows.
+          </Text>
+          <View style={styles.componentPreview}>
+            <QuickActions />
+          </View>
+
+          <Text variant="headline" style={styles.componentLabel}>
+            PromoBanner
+          </Text>
+          <Text variant="caption1" color="textTertiary" style={styles.componentDesc}>
+            Horizontal scroll with gradient cards. Pattern: LinearGradient (borderRadius only) →
+            inner View (padding + content). Snap-to-card scrolling.
+          </Text>
+          <View style={styles.fullBleedPreview}>
+            <PromoBanner />
+          </View>
+        </Section>
+
         {/* ─── Spacing Scale ───────────────────────────────────── */}
         <Section title="Spacing Scale">
           {(Object.entries(spacing) as [string, number][]).map(([name, value]) => (
@@ -350,4 +391,11 @@ const styles = StyleSheet.create({
   // Dividers
   divLabel: { marginBottom: spacing.sm },
   divGap: { height: spacing.lg },
+
+  // Home Components
+  componentNote: { marginBottom: spacing.xl },
+  componentLabel: { marginBottom: spacing.xs },
+  componentDesc: { marginBottom: spacing.md },
+  componentPreview: { marginBottom: spacing['2xl'] },
+  fullBleedPreview: { marginHorizontal: -spacing['2xl'], marginBottom: spacing['2xl'] },
 });

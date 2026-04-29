@@ -1,6 +1,5 @@
 /**
- * WalletCard — hero card showing user balance with gradient-like crimson background.
- * iOS modern style with glassmorphism feel.
+ * WalletCard — hero card with gradient background.
  */
 
 import React from 'react';
@@ -8,68 +7,76 @@ import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 
 import { ArrowRight } from 'lucide-react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { Text } from '@/components/ui';
 import { colors } from '@/theme/colors';
-import { radius, shadows, spacing } from '@/theme/spacing';
+import { radius, spacing } from '@/theme/spacing';
 
 export function WalletCard() {
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text variant="footnote" style={styles.label}>
-          Saldo Anda
+    <LinearGradient
+      colors={[colors.primary[500], colors.primary[700], colors.primary[900]]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.wrapper}
+    >
+      <View style={styles.inner}>
+        <View style={styles.header}>
+          <Text variant="footnote" style={styles.label}>
+            Saldo Anda
+          </Text>
+          <Pressable hitSlop={8} style={styles.topUpButton}>
+            <Text variant="footnote" style={styles.topUpLink}>
+              Top Up
+            </Text>
+            <ArrowRight size={12} color={colors.white} strokeWidth={2.5} />
+          </Pressable>
+        </View>
+
+        <Text variant="largeTitle" style={styles.balance}>
+          Rp 2.450.000
         </Text>
-        <Pressable hitSlop={8} style={styles.topUpButton}>
-          <Text variant="footnote" style={styles.topUpLink}>
-            Top Up
-          </Text>
-          <ArrowRight size={12} color={colors.white} strokeWidth={2.5} />
-        </Pressable>
-      </View>
 
-      <Text variant="largeTitle" style={styles.balance}>
-        Rp 2.450.000
-      </Text>
-
-      <View style={styles.footer}>
-        <View style={styles.footerItem}>
-          <Text variant="caption2" style={styles.footerLabel}>
-            Poin
-          </Text>
-          <Text variant="headline" style={styles.footerValue}>
-            1.250
-          </Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.footerItem}>
-          <Text variant="caption2" style={styles.footerLabel}>
-            Voucher
-          </Text>
-          <Text variant="headline" style={styles.footerValue}>
-            3
-          </Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.footerItem}>
-          <Text variant="caption2" style={styles.footerLabel}>
-            Level
-          </Text>
-          <Text variant="headline" style={styles.footerValue}>
-            Gold
-          </Text>
+        <View style={styles.footer}>
+          <View style={styles.footerItem}>
+            <Text variant="caption2" style={styles.footerLabel}>
+              Poin
+            </Text>
+            <Text variant="headline" style={styles.footerValue}>
+              1.250
+            </Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.footerItem}>
+            <Text variant="caption2" style={styles.footerLabel}>
+              Voucher
+            </Text>
+            <Text variant="headline" style={styles.footerValue}>
+              3
+            </Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.footerItem}>
+            <Text variant="caption2" style={styles.footerLabel}>
+              Level
+            </Text>
+            <Text variant="headline" style={styles.footerValue}>
+              Gold
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.primary[600],
-    borderRadius: radius['2xl'],
-    padding: spacing['2xl'],
-    ...shadows.lg,
+  wrapper: {
+    borderRadius: radius.xl,
+  },
+  inner: {
+    padding: spacing.xl,
   },
   header: {
     flexDirection: 'row',
