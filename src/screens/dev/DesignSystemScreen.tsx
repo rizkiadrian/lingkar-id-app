@@ -273,7 +273,19 @@ export function DesignSystemScreen() {
           </Text>
           <Text variant="caption1" color="textTertiary" style={styles.componentDesc}>
             Horizontal scroll with gradient cards. Pattern: LinearGradient (borderRadius only) →
-            inner View (padding + content). Snap-to-card scrolling.
+            inner View (padding + content). Snap-to-card scrolling. Supports API banners, fallback
+            promos, and skeleton loading state.
+          </Text>
+
+          <Text variant="footnote" color="textTertiary" style={styles.stateLabel}>
+            Loading (skeleton):
+          </Text>
+          <View style={styles.fullBleedPreview}>
+            <PromoBanner isLoading />
+          </View>
+
+          <Text variant="footnote" color="textTertiary" style={styles.stateLabel}>
+            Fallback (no API data):
           </Text>
           <View style={styles.fullBleedPreview}>
             <PromoBanner />
@@ -398,4 +410,5 @@ const styles = StyleSheet.create({
   componentDesc: { marginBottom: spacing.md },
   componentPreview: { marginBottom: spacing['2xl'] },
   fullBleedPreview: { marginHorizontal: -spacing['2xl'], marginBottom: spacing['2xl'] },
+  stateLabel: { marginBottom: spacing.sm },
 });

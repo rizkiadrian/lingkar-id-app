@@ -31,7 +31,7 @@ src/
 │   └── home/            # Home screen composites
 │       ├── WalletCard.tsx       # Gradient hero card (balance, points, voucher, level)
 │       ├── QuickActions.tsx     # 4×2 icon grid (flat tinted backgrounds)
-│       ├── PromoBanner.tsx      # Horizontal scroll gradient promo cards
+│       ├── PromoBanner.tsx      # Horizontal scroll promo cards (API banners + fallback + skeleton)
 │       ├── MitraHighlight.tsx   # Featured mitra search + categories
 │       ├── ServiceList.tsx      # Horizontal service cards from mitra
 │       └── RecentTransactions.tsx  # Latest transaction list
@@ -49,7 +49,8 @@ src/
 │   ├── main/            # Home, Activity, Scan, Notifications, Profile
 │   └── dev/             # Design System showcase (dev only)
 ├── services/
-│   └── auth/            # Auth API service + types
+│   ├── auth/            # Auth API service + types
+│   └── dashboard/       # Dashboard API service + types (banners)
 ├── store/
 │   ├── useAuthStore.ts  # Auth state (user, tokens, hydration)
 │   └── useErrorStore.ts # Global error/notification state
@@ -167,3 +168,13 @@ Tokens are stored in encrypted storage and silently refreshed via the Axios inte
 ## Backend
 
 This app connects to the [Lingkar ID Backend](../lingkar-id-backend) API. See that project's README for API documentation and setup.
+
+### Dashboard API
+
+The HomeScreen fetches `GET /api/v1/client/dashboard` on mount and on pull-to-refresh. Currently returns:
+
+| Field     | Type                 | Description                               |
+| --------- | -------------------- | ----------------------------------------- |
+| `banners` | `IDashboardBanner[]` | Active banners ordered by `display_order` |
+
+The PromoBanner component renders API banners when available, falls back to hardcoded gradient promos when the API returns no data, and shows skeleton placeholders while loading.
